@@ -1,8 +1,12 @@
 export class Organism {
-    constructor(context2d, position, size, alive) {
+    constructor(context2d, position, size) {
         this._context = context2d;
         this._position = position;
         this._size = size;
+        this._alive = false;
+    }
+
+    setAlive(alive) {
         this._alive = alive;
     }
 
