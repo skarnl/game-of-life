@@ -6,11 +6,16 @@ export class Organism {
         this._alive = false;
     }
 
+    isAlive() {
+        return this._alive;
+    }
+
     setAlive(alive) {
         this._alive = alive;
     }
 
     draw() {
+        this._context.clearRect(this._position.x, this._position.y, this._size, this._size);
         this._context.fillStyle = 'rgb(200, 0, 0)';
         this._context.strokeStyle = 'rgb(200, 0, 0)';
 
