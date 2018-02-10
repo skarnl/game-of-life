@@ -14,7 +14,11 @@ const DRAW_NUMBERS = DEBUG_MODE;
 
 let world = [];
 
-const worldConfiguration = [
+const SIZE = 20;
+const ALIVE_CHANGE = 0.25;
+
+//not used
+let worldConfiguration = [
     [0,0,0,0,0,0],
     [0,0,0,0,0,0],
     [0,0,1,1,1,0],
@@ -23,10 +27,21 @@ const worldConfiguration = [
     [0,0,0,0,0,0],
 ];
 
-const BLOCK_SIZE = 15;
-const MARGIN = 7;
+const BLOCK_SIZE = 10;
+const MARGIN = 3;
 const OUTSIDE_MARGIN = 30;
 const UPDATE_TICK_TIME = 700;
+
+//DISABLE this if you want to use the fixed worldConfiguration defined above
+worldConfiguration = [];
+for(let i = 0; i < SIZE; i++) {
+    worldConfiguration[i] = [];
+    for(let j = 0; j < SIZE; j++) {
+        const alive = Math.random() <= ALIVE_CHANGE ? 1 : 0;
+        worldConfiguration[i].push(alive)
+    }
+}
+//END DISABLE
 
 for (let rowIndex = 0; rowIndex < worldConfiguration.length; rowIndex++) {
     const row = worldConfiguration[rowIndex];
