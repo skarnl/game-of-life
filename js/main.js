@@ -7,21 +7,26 @@ canvas.height = window.innerHeight;
 
 const context2d = canvas.getContext('2d');
 
-const DEBUG_MODE = true;
+const DEBUG_MODE = false;
+
+//a seperate const, so we COULD overwrite it if we want to
+const DRAW_NUMBERS = DEBUG_MODE;
 
 let world = [];
 
 const worldConfiguration = [
-    [0,0,0,0,0],
-    [0,0,0,0,0],
-    [0,1,1,1,0],
-    [0,0,0,0,0],
-    [0,0,0,0,0],
+    [0,0,0,0,0,0],
+    [0,0,0,0,0,0],
+    [0,0,1,1,1,0],
+    [0,1,1,1,0,0],
+    [0,0,0,0,0,0],
+    [0,0,0,0,0,0],
 ];
 
 const BLOCK_SIZE = 15;
-const MARGIN = 10;
+const MARGIN = 7;
 const OUTSIDE_MARGIN = 30;
+const UPDATE_TICK_TIME = 700;
 
 for (let rowIndex = 0; rowIndex < worldConfiguration.length; rowIndex++) {
     const row = worldConfiguration[rowIndex];
@@ -41,50 +46,29 @@ for (let rowIndex = 0; rowIndex < worldConfiguration.length; rowIndex++) {
     world.push(worldRow);
 }
 
-update();
+draw();
+determineWorldState();
+drawNumbers();
+
 if (DEBUG_MODE) {
     document.body.addEventListener('click', tick.bind(this));
 } else {
-    setInterval(tick, 1500);
+    setInterval(tick, UPDATE_TICK_TIME);
 }
 
 /**
  * Update all organisms with their state
  */
 function determineWorldState() {
-    let newWorld = [];
-
     for(let rowIndex = 0; rowIndex < world.length; rowIndex++) {
-        let newRow = [];
 
         for(let columnIndex = 0; columnIndex < world[rowIndex].length; columnIndex++) {
-            let organism = world[rowIndex][columnIndex];
-
-            const numberSurroundingAlive = checkSurroundings(rowIndex, columnIndex);
-
-            if (organism.isAlive()) {
-                if (numberSurroundingAlive === 2 || numberSurroundingAlive === 3) {
-                    newRow.push(1);
-                } else {
-                    newRow.push(0);
-                }
-            } else if (numberSurroundingAlive === 3) {
-                newRow.push(1);
+            const organism = world[rowIndex][columnIndex];
+            organism.setNumberSurrounding(checkSurroundings(rowIndex, columnIndex));
             }
         }
-
-        newWorld.push(newRow);
     }
     
-    for (let rowIndex = 0; rowIndex < newWorld.length; rowIndex++) {
-        const row = newWorld[rowIndex];
-    
-        for (let colIndex = 0; colIndex < row.length; colIndex++) {
-            world[rowIndex][colIndex].setAlive(newWorld[rowIndex][colIndex] === 1);
-        }
-    }
-}
-
 /**
  *
  * @param {integer} rowIndex
@@ -131,15 +115,50 @@ function checkPosition(rowIndex, columnIndex) {
 /**
  * Update render of the world
  */
-function update() {
+function draw() {
     for(const row of world) {
         for(const organism of row) {
+            organism.setAlive(shouldOrganismBeAlive(organism));
             organism.draw();
         }
     }
 }
 
+function drawNumbers() {
+    if (DRAW_NUMBERS) {
+        for(const row of world) {
+            for(const organism of row) {
+                organism.drawNumbers();
+            }
+        }
+    }
+}
+
+/**
+ * 
+ * @param {Organism} organism 
+ */
+function shouldOrganismBeAlive(organism) {
+    //this is the initial draw
+    if (organism.getNumberSurrounding() === null) {
+        return organism.isAlive();
+    }
+    
+    if (organism.isAlive()) {
+        if (organism.getNumberSurrounding() === 2 || organism.getNumberSurrounding() === 3) {
+            return true;
+        } else {
+            return false;
+        }
+    } else if (organism.getNumberSurrounding() === 3) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function tick() {
+    draw();
     determineWorldState();
-    update();
+    drawNumbers();
 }
