@@ -62,14 +62,14 @@ function determineWorldState() {
 
             const numberSurroundingAlive = checkSurroundings(rowIndex, columnIndex);
 
-            if (organism.isAlive() === false && numberSurroundingAlive === 3) {
-                newRow.push(1);
-            } else {
-                if (numberSurroundingAlive < 2 || numberSurroundingAlive > 3) {
-                    newRow.push(0);
+            if (organism.isAlive()) {
+                if (numberSurroundingAlive === 2 || numberSurroundingAlive === 3) {
+                    newRow.push(1);
                 } else {
-                    newRow.push(organism.isAlive() ? 1 : 0);
+                    newRow.push(0);
                 }
+            } else if (numberSurroundingAlive === 3) {
+                newRow.push(1);
             }
         }
 
