@@ -1,14 +1,11 @@
 export class Organism {
-    constructor(context2d, position, size) {
-        this.RECT = 'rect';
-        this.CIRCLE = 'circle';
-        this.SHAPE = this.CIRCLE;
-
+    constructor(context2d, position, size, type) {
         this._context = context2d;
         this._position = position;
         this._size = size;
         this._alive = false;
         this._numberSurrounding = null;
+        this._type = type;
     }
 
     isAlive() {
@@ -39,7 +36,7 @@ export class Organism {
         this._context.fillStyle = 'rgb(200, 0, 0)';
         this._context.strokeStyle = 'rgb(200, 0, 0)';
 
-        if (this.SHAPE === this.CIRCLE) {
+        if (this._type === 'circle') {
             this._drawCircle();
         } else {
             this._drawRect();
@@ -66,6 +63,12 @@ export class Organism {
     }
 
     drawNumbers() {
+        if (this._alive) {
+            this._context.fillStyle = 'rgb(255,255,255)';
+        } else {
+            this._context.fillStyle = 'rgb(30,30,30)';
+        }
+
         this._context.fillText(this._numberSurrounding, this._position.x + this._size / 2, this._position.y + this._size / 2);
     }
 }

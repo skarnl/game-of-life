@@ -7,42 +7,53 @@ canvas.height = window.innerHeight;
 
 const context2d = canvas.getContext('2d');
 
+/** Enable this to don't auto-update but wait until the user has clicked */
 const DEBUG_MODE = false;
 
 //a seperate const, so we COULD overwrite it if we want to
 const DRAW_NUMBERS = DEBUG_MODE;
 
-let world = [];
+/** The dimensions of the grid (width and height) */
+const GRID_SIZE = 25;
 
-const SIZE = 20;
-const ALIVE_CHANGE = 0.25;
+/** The chance for a organism to become alive */
+const ALIVE_CHANCE = 0.25;
 
-//not used
-let worldConfiguration = [
-    [0,0,0,0,0,0],
-    [0,0,0,0,0,0],
-    [0,0,1,1,1,0],
-    [0,1,1,1,0,0],
-    [0,0,0,0,0,0],
-    [0,0,0,0,0,0],
-];
+/** The size of a organism */
+const BLOCK_SIZE = 15;
 
-const BLOCK_SIZE = 10;
+/** The margin between each organism */
 const MARGIN = 3;
-const OUTSIDE_MARGIN = 30;
-const UPDATE_TICK_TIME = 700;
 
-//DISABLE this if you want to use the fixed worldConfiguration defined above
-worldConfiguration = [];
-for(let i = 0; i < SIZE; i++) {
+/** The margin around the edge of the canvas */
+const OUTSIDE_MARGIN = 30;
+
+/** The time for each tick-cycle */
+const UPDATE_TICK_TIME = 1300;
+
+/** What shape the organism should have
+ * (choose between 'circle' or 'rect')
+ */
+const ORGANISM_TYPE = 'circle';
+
+let worldConfiguration = [];
+for(let i = 0; i < GRID_SIZE; i++) {
     worldConfiguration[i] = [];
-    for(let j = 0; j < SIZE; j++) {
-        const alive = Math.random() <= ALIVE_CHANGE ? 1 : 0;
+    for(let j = 0; j < GRID_SIZE; j++) {
+        const alive = Math.random() <= ALIVE_CHANCE ? 1 : 0;
         worldConfiguration[i].push(alive)
     }
 }
-//END DISABLE
 
+// Enable the following code to hard set the worldConfiguration:
+// worldConfiguration = [
+    //     [0,0,0,0,0],
+    //     [0,1,1,1,0],
+    //     [0,0,0,0,0],
+    // ];
+    
+let world = [];
+// Setup the world
 for (let rowIndex = 0; rowIndex < worldConfiguration.length; rowIndex++) {
     const row = worldConfiguration[rowIndex];
     let worldRow = [];
@@ -53,7 +64,7 @@ for (let rowIndex = 0; rowIndex < worldConfiguration.length; rowIndex++) {
         const x = OUTSIDE_MARGIN + colIndex * (BLOCK_SIZE + MARGIN);
         const y = OUTSIDE_MARGIN + rowIndex * (BLOCK_SIZE + MARGIN);
 
-        const o = new Organism(context2d, new Point(x, y), BLOCK_SIZE);
+        const o = new Organism(context2d, new Point(x, y), BLOCK_SIZE, ORGANISM_TYPE);
         o.setAlive(alive);
 
         worldRow.push(o);
@@ -128,7 +139,7 @@ function checkPosition(rowIndex, columnIndex) {
 }
 
 /**
- * Update render of the world
+ * Redraw the organisms
  */
 function draw() {
     for(const row of world) {
@@ -139,6 +150,9 @@ function draw() {
     }
 }
 
+/**
+ * Debug function to draw the numbers on the screen
+ */
 function drawNumbers() {
     if (DRAW_NUMBERS) {
         for(const row of world) {
@@ -150,8 +164,10 @@ function drawNumbers() {
 }
 
 /**
- * 
+ * Returns if the given organism should be alive, based on it's surrounding organisms
+ *  
  * @param {Organism} organism 
+ * @returns {Boolean}
  */
 function shouldOrganismBeAlive(organism) {
     //this is the initial draw
@@ -172,6 +188,9 @@ function shouldOrganismBeAlive(organism) {
     }
 }
 
+/**
+ * Update the world
+ */
 function tick() {
     draw();
     determineWorldState();
